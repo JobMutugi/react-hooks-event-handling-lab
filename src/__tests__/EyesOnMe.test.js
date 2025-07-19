@@ -1,31 +1,35 @@
-import "@testing-library/jest-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
-import EyesOnMe from "../components/EyesOnMe";
+import '@testing-library/jest-dom';  // Add this import at the top
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react';
+import EyesOnMe from '../components/EyesOnMe';
 
 beforeEach(() => {
-  render(<EyesOnMe />);
+  jest.spyOn(console, 'log').mockImplementation(() => {});
+});
+
+afterEach(() => {
+  console.log.mockRestore();
 });
 
 test('displays a button with the text "Eyes on me"', () => {
-  expect(screen.queryByText(/Eyes on me/)).toBeInTheDocument();
+  const { getByText } = render(<EyesOnMe />);
+  const button = getByText(/Eyes on me/i);
+  expect(button).toBeInTheDocument();
+  expect(button.tagName).toBe('BUTTON');
 });
 
-test("focusing the button triggers console output", () => {
-  console.log = jest.fn();
-
-  const button = screen.queryByText(/Eyes on me/);
+test('focusing the button triggers console output', () => {
+  const { getByText } = render(<EyesOnMe />);
+  const button = getByText(/Eyes on me/i);
+  
   fireEvent.focus(button);
-
-  expect(console.log).toHaveBeenCalled();
-  expect(console.log.mock.calls[0][0]).toBe("Good!");
+  expect(console.log).toHaveBeenCalledWith('Good!');
 });
 
-test("removing focus (blur) on the button triggers console output", () => {
-  console.log = jest.fn();
-
-  const button = screen.queryByText(/Eyes on me/);
+test('removing focus (blur) on the button triggers console output', () => {
+  const { getByText } = render(<EyesOnMe />);
+  const button = getByText(/Eyes on me/i);
+  
   fireEvent.blur(button);
-
-  expect(console.log).toHaveBeenCalled();
-  expect(console.log.mock.calls[0][0]).toBe("Hey! Eyes on me!");
+  expect(console.log).toHaveBeenCalledWith('Hey! Eyes on me!');
 });
